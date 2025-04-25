@@ -1,5 +1,3 @@
-
-# <p align="center">VocApp</p>
 <p align="center">
   <img src="assets/logo.png" width="200" alt="VocApp Logo">
 </p>

@@ -1,0 +1,73 @@
+{% extends "base.html" %} {% block title %}Create New Deck{% endblock %} {% block
+    content %}
+    <h1 class="text-3xl font-semibold text-gray-800 mb-4">Create New Deck</h1>
+    
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form action="{{ url_for('create_deck') }}" method="post">
+          <div class="mb-3">
+            <label for="name" class="form-label font-medium text-gray-700"
+              >Deck Name <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              required
+            />
+            <div class="form-text">
+              A unique name for your deck (e.g., "Cambridge C1 Phrasal Verbs").
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label font-medium text-gray-700"
+              >Description</label
+            >
+            <textarea
+              class="form-control"
+              id="description"
+              name="description"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="target_exam" class="form-label font-medium text-gray-700"
+                >Target Exam (Optional)</label
+              >
+              <select class="form-select" id="target_exam" name="target_exam">
+                <option value="">-- Select Exam --</option>
+                <option value="Cambridge">Cambridge English</option>
+                <option value="DELF">DELF/DALF (French)</option>
+                <option value="IELTS">IELTS</option>
+                <option value="TOEFL">TOEFL</option>
+                <option value="General">General</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="level" class="form-label font-medium text-gray-700"
+                >Level (Optional)</label
+              >
+              <select class="form-select" id="level" name="level">
+                <option value="">-- Select Level --</option>
+                <option value="A1">A1</option>
+                <option value="A2">A2</option>
+                <option value="B1">B1</option>
+                <option value="B2">B2</option>
+                <option value="C1">C1</option>
+                <option value="C2">C2</option>
+                <option value="Any">Any</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Create Deck</button>
+          <a href="{{ url_for('index') }}" class="btn btn-secondary ms-2"
+            >Cancel</a
+          >
+        </form>
+      </div>
+    </div>
+    {% endblock %}
+    

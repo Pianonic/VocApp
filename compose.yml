@@ -1,0 +1,13 @@
+services:
+  voc-app:
+    build: .
+    ports:
+      - "3918:5000"
+    environment:
+      - SECRET_KEY=change_this_to_a_very_strong_random_secret_key_3498tgu934gh
+    volumes:
+      - voc-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  voc-data:

@@ -1,0 +1,13 @@
+.git
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+*.db # Exclude the local database file if you have one
+*.db-journal # Exclude SQLite journal files
+.env # Don't copy environment files into the image
+docker-compose.yml
+Dockerfile
+README.md

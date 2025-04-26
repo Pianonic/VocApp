@@ -61,7 +61,7 @@
    ```
 
 3. **Build and Run:**
-   From the project's root directory (where `docker-compose.yml` is), run:
+   From the project's root directory (where `compose.yml` is), run:
    ```bash
    docker compose up --build -d
    ```

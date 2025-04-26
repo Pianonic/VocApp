@@ -1,0 +1,81 @@
+{% extends "base.html" %} {% block title %}Edit Deck: {{ deck['name'] }}{%
+    endblock %} {% block content %}
+    <h1 class="h2 mb-4">Edit Deck</h1>
+    
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form
+          action="{{ url_for('edit_deck', deck_id=deck['id']) }}"
+          method="post"
+        >
+          <div class="mb-3">
+            <label for="name" class="form-label fw-medium"
+              >Deck Name <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              required
+              value="{{ request.form.get('name', deck['name']) }}"
+            />
+            <div class="form-text">
+              A unique name for your deck (e.g., "Cambridge C1 Phrasal Verbs").
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label fw-medium"
+              >Description</label
+            >
+            <textarea
+              class="form-control"
+              id="description"
+              name="description"
+              rows="3"
+            >{{ request.form.get('description', deck['description']) }}</textarea>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="target_exam" class="form-label fw-medium"
+                >Target Exam (Optional)</label
+              >
+              <select class="form-select" id="target_exam" name="target_exam">
+                {% set current_exam = request.form.get('target_exam', deck['target_exam']) %}
+                <option value="" {% if not current_exam %}selected{% endif %}>-- Select Exam --</option>
+                <option value="Cambridge" {% if current_exam == 'Cambridge' %}selected{% endif %}>Cambridge English</option>
+                <option value="DELF" {% if current_exam == 'DELF' %}selected{% endif %}>DELF/DALF (French)</option>
+                <option value="IELTS" {% if current_exam == 'IELTS' %}selected{% endif %}>IELTS</option>
+                <option value="TOEFL" {% if current_exam == 'TOEFL' %}selected{% endif %}>TOEFL</option>
+                <option value="General" {% if current_exam == 'General' %}selected{% endif %}>General</option>
+                <option value="Other" {% if current_exam == 'Other' %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="level" class="form-label fw-medium"
+                >Level (Optional)</label
+              >
+              <select class="form-select" id="level" name="level">
+                {% set current_level = request.form.get('level', deck['level']) %}
+                <option value="" {% if not current_level %}selected{% endif %}>-- Select Level --</option>
+                <option value="A1" {% if current_level == 'A1' %}selected{% endif %}>A1</option>
+                <option value="A2" {% if current_level == 'A2' %}selected{% endif %}>A2</option>
+                <option value="B1" {% if current_level == 'B1' %}selected{% endif %}>B1</option>
+                <option value="B2" {% if current_level == 'B2' %}selected{% endif %}>B2</option>
+                <option value="C1" {% if current_level == 'C1' %}selected{% endif %}>C1</option>
+                <option value="C2" {% if current_level == 'C2' %}selected{% endif %}>C2</option>
+                <option value="Any" {% if current_level == 'Any' %}selected{% endif %}>Any</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Update Deck</button>
+          <a
+            href="{{ url_for('view_deck', deck_id=deck['id']) }}"
+            class="btn btn-secondary ms-2"
+            >Cancel</a
+          >
+        </form>
+      </div>
+    </div>
+    {% endblock %}
+    

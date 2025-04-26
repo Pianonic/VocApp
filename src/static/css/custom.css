@@ -1,0 +1,41 @@
+body {
+    padding-top: 56px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .flash-message {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    z-index: 1050;
+  }
+  .navbar-brand {
+     color: rgba(255, 255, 255, 0.9) !important;
+  }
+  [data-bs-theme="dark"] .card,
+  [data-bs-theme="dark"] .list-group-item {
+     background-color: var(--bs-dark-bg-subtle);
+     border-color: var(--bs-border-color-translucent);
+  }
+  [data-bs-theme="dark"] .translation-color {
+     color: rgb(180, 100, 255); /* Lighter purple for dark mode */
+   }
+   [data-bs-theme="light"] .translation-color {
+     color: rgb(126, 34, 206); /* Original purple for light mode */
+   }
+   .navbar .dropdown-menu {
+      --bs-dropdown-link-active-bg: var(--bs-primary);
+   }
+   [data-bs-theme="dark"] .navbar .dropdown-menu {
+      --bs-dropdown-bg: var(--bs-dark-bg-subtle);
+      --bs-dropdown-link-color: var(--bs-light);
+      --bs-dropdown-link-hover-color: var(--bs-light);
+      --bs-dropdown-link-hover-bg: rgba(255, 255, 255, 0.15);
+      --bs-dropdown-link-active-color: #fff;
+      --bs-dropdown-border-color: var(--bs-border-color-translucent);
+   }
+   #bd-theme-icon {
+     margin-right: 0.5rem;
+     vertical-align: text-bottom;
+     opacity: 0.8;
+   }
+  

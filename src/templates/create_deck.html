@@ -1,0 +1,74 @@
+{% extends "base.html" %} {% block title %}Create New Deck{% endblock %} {%
+  block content %}
+  <h1 class="h2 mb-4">Create New Deck</h1>
+  
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form action="{{ url_for('create_deck') }}" method="post">
+        <div class="mb-3">
+          <label for="name" class="form-label fw-medium"
+            >Deck Name <span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            name="name"
+            required
+            value="{{ form_data.name if form_data else '' }}"
+          />
+          <div class="form-text">
+            A unique name for your deck (e.g., "Cambridge C1 Phrasal Verbs").
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="description" class="form-label fw-medium"
+            >Description</label
+          >
+          <textarea
+            class="form-control"
+            id="description"
+            name="description"
+            rows="3"
+          >{{ form_data.description if form_data else '' }}</textarea>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="target_exam" class="form-label fw-medium"
+              >Target Exam (Optional)</label
+            >
+            <select class="form-select" id="target_exam" name="target_exam">
+              <option value="" {% if not form_data or not form_data.target_exam %}selected{% endif %}>-- Select Exam --</option>
+              <option value="Cambridge" {% if form_data and form_data.target_exam == 'Cambridge' %}selected{% endif %}>Cambridge English</option>
+              <option value="DELF" {% if form_data and form_data.target_exam == 'DELF' %}selected{% endif %}>DELF/DALF (French)</option>
+              <option value="IELTS" {% if form_data and form_data.target_exam == 'IELTS' %}selected{% endif %}>IELTS</option>
+              <option value="TOEFL" {% if form_data and form_data.target_exam == 'TOEFL' %}selected{% endif %}>TOEFL</option>
+              <option value="General" {% if form_data and form_data.target_exam == 'General' %}selected{% endif %}>General</option>
+              <option value="Other" {% if form_data and form_data.target_exam == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="level" class="form-label fw-medium"
+              >Level (Optional)</label
+            >
+            <select class="form-select" id="level" name="level">
+              <option value="" {% if not form_data or not form_data.level %}selected{% endif %}>-- Select Level --</option>
+              <option value="A1" {% if form_data and form_data.level == 'A1' %}selected{% endif %}>A1</option>
+              <option value="A2" {% if form_data and form_data.level == 'A2' %}selected{% endif %}>A2</option>
+              <option value="B1" {% if form_data and form_data.level == 'B1' %}selected{% endif %}>B1</option>
+              <option value="B2" {% if form_data and form_data.level == 'B2' %}selected{% endif %}>B2</option>
+              <option value="C1" {% if form_data and form_data.level == 'C1' %}selected{% endif %}>C1</option>
+              <option value="C2" {% if form_data and form_data.level == 'C2' %}selected{% endif %}>C2</option>
+              <option value="Any" {% if form_data and form_data.level == 'Any' %}selected{% endif %}>Any</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Deck</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary ms-2"
+          >Cancel</a
+        >
+      </form>
+    </div>
+  </div>
+  {% endblock %}
+  

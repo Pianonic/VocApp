@@ -9,23 +9,31 @@ from flask import (
     jsonify,
 )
 import sqlite3
-import database
+from src import database
 import json
 import os
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "a_default_secret_key_change_me")
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY", "a_default_secret_key_change_me"
+)
+
 
 def get_db():
     if "db" not in g:
         g.db = database.get_db()
     return g.db
 
+
 @app.teardown_appcontext
 def close_db(error):
     db = g.pop("db", None)
     if db is not None:
         db.close()
+
+database.init_db()
+app.logger.info("Database initialization check complete.")
+
 
 @app.route("/")
 def index():
@@ -34,6 +42,7 @@ def index():
     cursor.execute("SELECT * FROM decks ORDER BY created_at DESC")
     decks = cursor.fetchall()
     return render_template("index.html", decks=decks)
+
 
 @app.route("/create_deck", methods=["GET", "POST"])
 def create_deck():
@@ -62,7 +71,10 @@ def create_deck():
             return redirect(url_for("index"))
         except sqlite3.IntegrityError:
             db.rollback()
-            flash(f"Deck name '{name}' already exists. Please choose a different name.", "danger")
+            flash(
+                f"Deck name '{name}' already exists. Please choose a different name.",
+                "danger",
+            )
             return render_template("create_deck.html", form_data=request.form)
         except Exception as e:
             db.rollback()
@@ -71,6 +83,56 @@ def create_deck():
             return render_template("create_deck.html", form_data=request.form)
 
     return render_template("create_deck.html")
+
+
+@app.route("/edit_deck/<int:deck_id>", methods=["GET", "POST"])
+def edit_deck(deck_id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM decks WHERE id = ?", (deck_id,))
+    deck = cursor.fetchone()
+
+    if not deck:
+        flash("Deck not found.", "danger")
+        return redirect(url_for("index"))
+
+    if request.method == "POST":
+        name = request.form.get("name")
+        description = request.form.get("description")
+        target_exam = request.form.get("target_exam")
+        level = request.form.get("level")
+
+        if not name:
+            flash("Deck Name is required.", "warning")
+            return render_template("edit_deck.html", deck=deck)
+
+        try:
+            cursor.execute(
+                """
+                UPDATE decks
+                SET name = ?, description = ?, target_exam = ?, level = ?
+                WHERE id = ?
+                """,
+                (name, description, target_exam, level, deck_id),
+            )
+            db.commit()
+            flash(f"Deck '{name}' updated successfully!", "success")
+            return redirect(url_for("view_deck", deck_id=deck_id))
+        except sqlite3.IntegrityError:
+            db.rollback()
+            flash(
+                f"Deck name '{name}' already exists. Please choose a different name.",
+                "danger",
+            )
+            return render_template("edit_deck.html", deck=deck)
+        except Exception as e:
+            db.rollback()
+            flash(f"An error occurred updating the deck: {e}", "danger")
+            app.logger.error(f"Error updating deck {deck_id}: {e}")
+            return render_template("edit_deck.html", deck=deck)
+
+    return render_template("edit_deck.html", deck=deck)
+
 
 @app.route("/deck/<int:deck_id>", methods=["GET", "POST"])
 def view_deck(deck_id):
@@ -111,11 +173,62 @@ def view_deck(deck_id):
         return redirect(url_for("index"))
 
     cursor.execute(
-        "SELECT * FROM words WHERE deck_id = ? ORDER BY RANDOM()", (deck_id,)
+        "SELECT * FROM words WHERE deck_id = ? ORDER BY created_at DESC",
+        (deck_id,),
     )
     words = cursor.fetchall()
 
     return render_template("deck.html", deck=deck, words=words)
+
+
+@app.route("/edit_word/<int:word_id>", methods=["GET", "POST"])
+def edit_word(word_id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM words WHERE id = ?", (word_id,))
+    word = cursor.fetchone()
+
+    if not word:
+        flash("Word not found.", "danger")
+        return redirect(url_for("index"))
+
+    deck_id = word["deck_id"]
+
+    if request.method == "POST":
+        term = request.form.get("term")
+        definition = request.form.get("definition")
+        example = request.form.get("example")
+        translation = request.form.get("translation")
+        post_deck_id = request.form.get("deck_id")
+
+        if not term or not definition:
+            flash("Term and Definition are required.", "warning")
+            return render_template("edit_word.html", word=word)
+
+        if not post_deck_id:
+            flash("Deck ID missing, cannot update word.", "danger")
+            return redirect(url_for("index"))
+
+        try:
+            cursor.execute(
+                """
+                UPDATE words
+                SET term = ?, definition = ?, example = ?, translation = ?
+                WHERE id = ?
+                """,
+                (term, definition, example, translation, word_id),
+            )
+            db.commit()
+            flash(f"Word '{term}' updated successfully!", "success")
+            return redirect(url_for("view_deck", deck_id=post_deck_id))
+        except Exception as e:
+            db.rollback()
+            flash(f"An error occurred updating the word: {e}", "danger")
+            app.logger.error(f"Error updating word {word_id}: {e}")
+            return render_template("edit_word.html", word=word)
+
+    return render_template("edit_word.html", word=word)
+
 
 @app.route("/delete_deck/<int:deck_id>", methods=["POST"])
 def delete_deck(deck_id):
@@ -124,7 +237,7 @@ def delete_deck(deck_id):
     try:
         cursor.execute("SELECT name FROM decks WHERE id = ?", (deck_id,))
         deck = cursor.fetchone()
-        deck_name = deck['name'] if deck else f"ID {deck_id}"
+        deck_name = deck["name"] if deck else f"ID {deck_id}"
 
         cursor.execute("DELETE FROM decks WHERE id = ?", (deck_id,))
         db.commit()
@@ -135,6 +248,7 @@ def delete_deck(deck_id):
         app.logger.error(f"Error deleting deck {deck_id}: {e}")
 
     return redirect(url_for("index"))
+
 
 @app.route("/delete_word/<int:word_id>", methods=["POST"])
 def delete_word(word_id):
@@ -148,7 +262,7 @@ def delete_word(word_id):
     try:
         cursor.execute("SELECT term FROM words WHERE id = ?", (word_id,))
         word = cursor.fetchone()
-        word_term = word['term'] if word else f"ID {word_id}"
+        word_term = word["term"] if word else f"ID {word_id}"
 
         cursor.execute("DELETE FROM words WHERE id = ?", (word_id,))
         db.commit()
@@ -159,6 +273,7 @@ def delete_word(word_id):
         app.logger.error(f"Error deleting word {word_id}: {e}")
 
     return redirect(url_for("view_deck", deck_id=deck_id))
+
 
 @app.route("/learn/<int:deck_id>")
 def learn_deck(deck_id):
@@ -174,7 +289,7 @@ def learn_deck(deck_id):
 
     cursor.execute(
         "SELECT id, term, definition, example, translation FROM words WHERE deck_id = ? ORDER BY RANDOM()",
-        (deck_id,)
+        (deck_id,),
     )
     words_raw = cursor.fetchall()
 
@@ -186,7 +301,13 @@ def learn_deck(deck_id):
 
     words_json = json.dumps(words)
 
-    return render_template("learn.html", deck=deck, words_json=words_json, total_words=len(words))
+    return render_template(
+        "learn.html",
+        deck=deck,
+        words_json=words_json,
+        total_words=len(words),
+    )
+
 
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=5000)

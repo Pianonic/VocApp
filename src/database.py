@@ -1,47 +1,39 @@
-# database.py
 import sqlite3
 import os
 
-DATABASE = "vocabulary.db"
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+DATABASE = os.path.join(DATA_DIR, "vocabulary.db")
 
 
 def get_db():
-    """Connects to the specific database."""
+    os.makedirs(DATA_DIR, exist_ok=True)
     conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row  # Return rows as dictionary-like objects
-    # Enable foreign key support
+    conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 
 def init_db():
-    """Initializes the database schema."""
-    if os.path.exists(DATABASE):
-        print("Database already exists.")
-        return
-
-    print("Initializing database...")
+    os.makedirs(DATA_DIR, exist_ok=True)
     conn = get_db()
     cursor = conn.cursor()
 
-    # Create decks table
     cursor.execute(
         """
-        CREATE TABLE decks (
+        CREATE TABLE IF NOT EXISTS decks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL UNIQUE,
             description TEXT,
-            target_exam TEXT, -- e.g., 'Cambridge', 'DELF'
-            level TEXT,       -- e.g., 'C1', 'B2'
+            target_exam TEXT,
+            level TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """
+        """
     )
 
-    # Create words table
     cursor.execute(
         """
-        CREATE TABLE words (
+        CREATE TABLE IF NOT EXISTS words (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             deck_id INTEGER NOT NULL,
             term TEXT NOT NULL,
@@ -51,15 +43,8 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (deck_id) REFERENCES decks(id) ON DELETE CASCADE
         )
-    """
+        """
     )
-    # ON DELETE CASCADE means if a deck is deleted, its words are also deleted
 
     conn.commit()
     conn.close()
-    print("Database initialized.")
-
-
-if __name__ == "__main__":
-    # Run this script directly to initialize the DB
-    init_db()

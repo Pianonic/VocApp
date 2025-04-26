@@ -4,7 +4,7 @@ services:
     ports:
       - "3918:5000"
     environment:
-      - SECRET_KEY=ALSKDJKLA999SJD_askj444dhahasd_1982389!!!!
+      - SECRET_KEY=
     volumes:
       - ./src/data:/app/src/data
     restart: unless-stopped

@@ -6,7 +6,7 @@
   Designed to help prepare for language exams like Cambridge English and DELF/DALF.
 </p>
 <p align="center">
-  <a href="https://github.com/Pianonic/VocApp"><img src="https://badgetrack.pianonic.ch/badge?url=Pianonic%2FVocApp&label=visits&color=34D399&style=flat&logo=github" alt="visits" /></a>
+  <a href="https://github.com/Pianonic/VocApp"><img src="https://badgetrack.pianonic.ch/badge?tag=voc-app&label=visits&color=34D399&style=flat" alt="visits" /></a>
   <a href="https://github.com/Pianonic/VocApp?tab=readme-ov-file#-installation-docker-recommended"><img src="https://img.shields.io/badge/Selfhost-Instructions-34D399.svg"/></a>
   <a href="https://github.com/Pianonic/VocApp/blob/main/devenv.md"><img src="https://img.shields.io/badge/Development-Setup-34D399.svg"/></a>
 </p>
